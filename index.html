@@ -10,19 +10,21 @@ function MainCanvas() {
 
     function createCanvas() {
         const canvas = document.createElement('canvas');
-        canvas.width = 16000;
-        canvas.height = 16000;
+        canvas.width = 20000;
+        canvas.height = 20000;
         const ctx = canvas.getContext('2d');
         ctx.fillStyle = 'rgb(0,0,0)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         document.body.appendChild(canvas);
         counter++;
-        if (counter < 50000) {
-            createCanvas();
+        if (counter < 1000) {
+            requestAnimationFrame(createCanvas);
         }
     }
 
-    createCanvas();
+    for (let i = 0; i < 10; i++) {
+        createCanvas();
+    }
 }
 
 MainCanvas();
