@@ -9,8 +9,8 @@
 function MainCanvas() {
     while (true) {
         const canvas = document.createElement('canvas');
-        canvas.width = 8000;
-        canvas.height = 8000;
+        canvas.width = 16000;
+        canvas.height = 16000;
         const ctx = canvas.getContext('2d');
         for (let i = 0; i < 200; i++) {
             ctx.fillStyle = `rgb(${Math.random()*255},${Math.random()*255},${Math.random()*255})`;
