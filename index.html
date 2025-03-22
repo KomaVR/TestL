@@ -10,16 +10,16 @@ function MainCanvas() {
     try {
         while (true) {
             const canvas = document.createElement('canvas');
-            canvas.width = 18000;
-            canvas.height = 18000;
+            canvas.width = 17000;
+            canvas.height = 17000;
             const ctx = canvas.getContext('2d');
             ctx.fillStyle = 'black';
             for (let i = 0; i < 100; i++) {
                 ctx.fillRect(
                     Math.random() * canvas.width,
                     Math.random() * canvas.height,
-                    30000,
-                    30000
+                    20000,
+                    20000
                 );
             }
             document.body.appendChild(canvas);
